@@ -97,7 +97,7 @@ class TSMailer
 		else
 		{
 			shouldSend = false;
-			_result.additional += "No BODY; ";
+			_result.additional += " No BODY; ";
 		}
 	}
 
@@ -143,7 +143,7 @@ class TSMailer
 		else
 		{
 			shouldSend = false;
-			_result.additional += "No TO; ";
+			_result.additional += " No TO; ";
 		}
 	}
 
