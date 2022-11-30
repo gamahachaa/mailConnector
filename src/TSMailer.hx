@@ -11,7 +11,7 @@ import php.Web;
 typedef Result =
 {
 	var status:String;
-	var error:String;
+	var error:Dynamic;
 	var additional:String;
 }
 class TSMailer
@@ -27,15 +27,14 @@ class TSMailer
 
 	public function new()
 	{
-		_result = {status: "failed", error : "", additional : ""};
+		//_result = {status: "failed", error : "", additional : ""};
+		_result = {status: "failed", error : null, additional : ""};
 		Syntax.code("require_once({0})", "vendor/autoload.php");
 		transport = Syntax.construct("Swift_SmtpTransport", 'smtp.salt.ch', 25);
 		Syntax.call(transport, "setUsername", "bbaudry" );
 		//Syntax.call(transport, "setPassword", "Saa..t33" );
 
 		mailer = Syntax.construct("Swift_Mailer", transport);
-		
-		
 
 		route = Web.getURI();
 		params = Web.getParams();
@@ -67,7 +66,7 @@ class TSMailer
 			if (result)
 			{
 				_result.status = "success";
-				_result.error = "";
+				//_result.error = "";
 				//Lib.print("{status:'success'}");
 			}
 			else

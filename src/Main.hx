@@ -17,9 +17,7 @@ class Main
 	}
 	public function new ()
 	{
-		var result:Result = {status:"failed", error:"", additional:"initial"};
-		//result.status = "failed";
-		//result.error = "";
+		var result:Result = {status:"failed", error:null, additional:"initial"};
 		try{
 			var mailer:TSMailer = new TSMailer();
 		}
