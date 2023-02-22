@@ -131,6 +131,14 @@ class Exception extends \Exception {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function get_message () {
+		#C:\HaxeToolkit\haxe\std/php/_std/haxe/Exception.hx:64: characters 3-27
+		return $this->getMessage();
+	}
+
+	/**
 	 * @return mixed
 	 */
 	final public function get_native () {
@@ -149,5 +157,6 @@ class Exception extends \Exception {
 
 Boot::registerClass(Exception::class, 'haxe.Exception');
 Boot::registerGetters('haxe\\Exception', [
-	'native' => true
+	'native' => true,
+	'message' => true
 ]);

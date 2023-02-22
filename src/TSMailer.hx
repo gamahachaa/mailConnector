@@ -13,6 +13,7 @@ typedef Result =
 	var status:String;
 	var error:Dynamic;
 	var additional:String;
+	var ?debug:String;
 }
 class TSMailer
 {
@@ -28,7 +29,7 @@ class TSMailer
 	public function new()
 	{
 		//_result = {status: "failed", error : "", additional : ""};
-		_result = {status: "failed", error : null, additional : ""};
+		_result = {status: "failed", error : null, additional : "", debug:""};
 		Syntax.code("require_once({0})", "vendor/autoload.php");
 		transport = Syntax.construct("Swift_SmtpTransport", 'smtp.salt.ch', 25);
 		Syntax.call(transport, "setUsername", "bbaudry" );
@@ -39,19 +40,32 @@ class TSMailer
 		route = Web.getURI();
 		params = Web.getParams();
 		shouldSend = true;
-		
+		message = Syntax.construct("Swift_Message", "ERRORED");
+
 		/////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////
 		if (params.exists("subject"))
 		{
-			_result.additional = params.get("subject");
-			message = prepareSubject();
-			prepareBody();
-			prepareTo();
-			// non blocking
-			prepareFrom();
-			prepareCc();
-			prepareBcc();
+			try
+			{
+				prepareTo();
+				// non blocking
+				prepareFrom();
+				prepareCc();
+				prepareBcc();
+				prepareBody();
+				_result.additional = params.get("subject");
+				_result.debug = params.get("subject");
+				message = prepareSubject(params.get("subject"));
+				_result.debug = message;
+				
+				
+			}
+			catch (e)
+			{
+				_result.debug = e.message;
+			}
+
 		}
 		else
 		{
@@ -121,7 +135,7 @@ class TSMailer
 		if (params.exists("cc_email"))
 		{
 			var t = params.get("cc_email").split(",");
-			
+
 			//Reflect.setField(cc, params.get("cc_email"), params.exists("cc_full_name") ? params.get("cc_full_name") : "" );
 			for (i in t)
 			{
@@ -159,9 +173,10 @@ class TSMailer
 		Syntax.call(message, "setFrom", Lib.associativeArrayOfObject(from));
 	}
 
-	function prepareSubject()
+	function prepareSubject(s:String)
 	{
-		return Syntax.construct("Swift_Message", params.get("subject"));
+		//return Syntax.construct("Swift_Message", params.get("subject"));
+		return Syntax.construct("Swift_Message", s);
 	}
 
 }
