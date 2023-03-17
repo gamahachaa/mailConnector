@@ -1,0 +1,4 @@
+-lib utils
+-cp src
+-php bin
+-main Main
