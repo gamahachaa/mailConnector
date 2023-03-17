@@ -11,7 +11,7 @@ if "%1"=="debug"  goto :end
    /command ^
      "open sftp://qook:uU155cy54IGQf0M4Jek6@10.192.14.13/ -hostkey=""ssh-rsa 2048 nqlUJZBRZk4+gCB8pRNrGcXJrx13iKLTftGfrXlqvk4=""" ^
      "lcd %BINDIR%lib" ^
- "cd /home/qook/app/entry_point_qook/commonlibs/mail/lib" ^
+ "cd /home/qook/app/qook/commonlibs/mail-test/lib" ^
      "put -nopreservetime *" ^
      "exit"
 	
@@ -20,7 +20,7 @@ if "%1"=="debug"  goto :end
    /command ^
      "open sftp://qook:uU155cy54IGQf0M4Jek6@10.192.14.13/ -hostkey=""ssh-rsa 2048 nqlUJZBRZk4+gCB8pRNrGcXJrx13iKLTftGfrXlqvk4=""" ^
      "lcd %BINDIR%" ^
-     "cd /home/qook/app/entry_point_qook/commonlibs/mail" ^
+     "cd /home/qook/app/qook/commonlibs/mail-test" ^
      "put -nopreservetime index.php" ^
      "exit"
 goto :completed

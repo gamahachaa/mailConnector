@@ -1,5 +1,8 @@
 package;
 import haxe.Json;
+import haxe.crypto.Base64;
+import mail.Params;
+import mail.Results;
 import php.Lib;
 import php.Syntax;
 import php.Web;
@@ -25,17 +28,20 @@ class TSMailer
 	var message:Dynamic;
 	var shouldSend:Bool;
 	var _result:Result;
+	//static inline var SUBJECT:String = "subject";
+	//static inline var BODY:String = "body";
+	//static inline var BCC_EMAIL:String = "bcc_email";
+	//static inline var CC_EMAIL:String = "cc_email";
+	//static inline var TO_EMAIL:String = "to_email";
+	//static inline var TO_FULL_NAME:String = "to_full_name";
 
 	public function new()
 	{
+		
+		// init
+		createSwiftMailer();
 		//_result = {status: "failed", error : "", additional : ""};
-		_result = {status: "failed", error : null, additional : "", debug:""};
-		Syntax.code("require_once({0})", "vendor/autoload.php");
-		transport = Syntax.construct("Swift_SmtpTransport", 'smtp.salt.ch', 25);
-		Syntax.call(transport, "setUsername", "bbaudry" );
-		//Syntax.call(transport, "setPassword", "Saa..t33" );
-
-		mailer = Syntax.construct("Swift_Mailer", transport);
+		_result = {status: Results.FAILED, error : null, additional : "", debug:""};
 
 		route = Web.getURI();
 		params = Web.getParams();
@@ -44,7 +50,7 @@ class TSMailer
 
 		/////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////
-		if (params.exists("subject"))
+		if (params.exists(Params.SUBJECT))
 		{
 			try
 			{
@@ -53,13 +59,13 @@ class TSMailer
 				prepareFrom();
 				prepareCc();
 				prepareBcc();
-				prepareBody();
-				_result.additional = params.get("subject");
-				_result.debug = params.get("subject");
-				message = prepareSubject(params.get("subject"));
+				prepareImage();
+				prepareBody(prepareImage());
+				_result.additional = params.get(Params.SUBJECT);
+				_result.debug = params.get(Params.SUBJECT);
+				message = prepareSubject(params.get(Params.SUBJECT));
 				_result.debug = message;
-				
-				
+
 			}
 			catch (e)
 			{
@@ -101,11 +107,26 @@ class TSMailer
 		Lib.print(Json.stringify( _result ) );
 	}
 
-	function prepareBody()
+	function prepareBody(?image = null)
 	{
-		if (params.exists("body"))
+		if (params.exists(Params.BODY))
 		{
-			Syntax.call(message, "setBody", params.get("body"), "text/html");
+			var body = params.get(Params.BODY);
+			if (image != null)
+			{
+				var img = '<img src="$image" alt="Image"/>';
+				body = if (params.exists(Params.STRING_TO_REPLACE))
+				{
+					StringTools.replace(body, params.get(Params.STRING_TO_REPLACE),  img);
+				}
+				else{
+					StringTools.replace(body, "</body>", img + "</body>");
+				}
+			}
+			else{
+				 StringTools.replace(body, params.get(Params.STRING_TO_REPLACE), "");
+			}
+			Syntax.call(message, "setBody", body, "text/html");
 		}
 		else
 		{
@@ -117,9 +138,9 @@ class TSMailer
 	function prepareBcc()
 	{
 		var bcc = {};
-		if (params.exists("bcc_email"))
+		if (params.exists(Params.BCC_EMAIL))
 		{
-			var t = params.get("bcc_email").split(",");
+			var t = params.get(Params.BCC_EMAIL).split(",");
 			for (i in t)
 			{
 				Reflect.setField(bcc, i, "" );
@@ -132,9 +153,9 @@ class TSMailer
 	function prepareCc()
 	{
 		var cc = {};
-		if (params.exists("cc_email"))
+		if (params.exists(Params.CC_EMAIL))
 		{
-			var t = params.get("cc_email").split(",");
+			var t = params.get(Params.CC_EMAIL).split(",");
 
 			//Reflect.setField(cc, params.get("cc_email"), params.exists("cc_full_name") ? params.get("cc_full_name") : "" );
 			for (i in t)
@@ -148,9 +169,9 @@ class TSMailer
 	function prepareTo()
 	{
 		var to = {};
-		if (params.exists("to_email"))
+		if (params.exists(Params.TO_EMAIL))
 		{
-			Reflect.setField(to, params.get("to_email"), params.exists("to_full_name") ? params.get("to_full_name"): "");
+			Reflect.setField(to, params.get(Params.TO_EMAIL), params.exists(Params.TO_FULL_NAME) ? params.get(Params.TO_FULL_NAME): "");
 			Syntax.call(message, "setTo", Lib.associativeArrayOfObject(to));
 		}
 		else
@@ -164,19 +185,45 @@ class TSMailer
 	{
 		var from = {};
 
-		if (!params.exists("from_email"))
+		if (!params.exists(Params.FROM_MAIL))
 		{
-			params.set("from_email", "qook@salt.ch");
+			params.set(Params.FROM_MAIL, "qook@salt.ch");
 			params.set("from_full_name", "qook troubleshoooting");
 		}
-		Reflect.setField(from, params.get("from_email"), params.exists("from_full_name") ? params.get("from_full_name") : "" );
-		Syntax.call(message, "setFrom", Lib.associativeArrayOfObject(from));
+		Reflect.setField(from, params.get(Params.FROM_MAIL), params.exists("from_full_name") ? params.get("from_full_name") : "" );
+		//Syntax.call(message, "setFrom", Lib.associativeArrayOfObject(from));
+		Syntax.call(message, "setFrom", from);
 	}
 
 	function prepareSubject(s:String)
 	{
-		//return Syntax.construct("Swift_Message", params.get("subject"));
+		//return Syntax.construct("Swift_Message", params.get(SUBJECT));
 		return Syntax.construct("Swift_Message", s);
+	}
+	function prepareImage()
+	{
+		var embeded:Dynamic = null;
+		if (this.params.exists(Params.IMAGE))
+		{
+            var ext = params.exists(Params.IMAGE_EXT) ? params.get(Params.IMAGE_EXT): "image/png";
+			var imgData =  Base64.decode(params.get(Params.IMAGE));
+			var swiftImage = Syntax.construct("Swift_Image", imgData , ext );
+			embeded = Syntax.call(message, "embed", swiftImage);
+			
+		}
+		return embeded;
+	}
+
+	inline function createSwiftMailer():Void
+	{
+		// call framework SwiftMAiler (symphony as PHP)
+		Syntax.code("require_once({0})", "vendor/autoload.php");
+		// set tup
+		transport = Syntax.construct("Swift_SmtpTransport", 'smtp.salt.ch', 25);
+		Syntax.call(transport, "setUsername", "bbaudry" );
+		//Syntax.call(transport, "setPassword", "1234" );
+
+		mailer = Syntax.construct("Swift_Mailer", transport);
 	}
 
 }
