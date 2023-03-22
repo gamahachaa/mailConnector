@@ -1,6 +1,5 @@
 <?php
 /**
- * Haxe source file: C:\HaxeToolkit\haxe\std/php/_std/Array.hx
  */
 
 use \haxe\iterators\ArrayIterator as IteratorsArrayIterator;

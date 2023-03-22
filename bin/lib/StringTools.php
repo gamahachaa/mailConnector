@@ -1,6 +1,5 @@
 <?php
 /**
- * Haxe source file: C:\HaxeToolkit\haxe\std/php/_std/StringTools.hx
  */
 
 use \php\Boot;
@@ -57,6 +56,30 @@ class StringTools {
 			#C:\HaxeToolkit\haxe\std/php/_std/StringTools.hx:99: characters 4-30
 			return ($c . $s);
 		}
+	}
+
+	/**
+	 * Replace all occurrences of the String `sub` in the String `s` by the
+	 * String `by`.
+	 * If `sub` is the empty String `""`, `by` is inserted after each character
+	 * of `s` except the last one. If `by` is also the empty String `""`, `s`
+	 * remains unchanged.
+	 * If `sub` or `by` are null, the result is unspecified.
+	 * 
+	 * @param string $s
+	 * @param string $sub
+	 * @param string $by
+	 * 
+	 * @return string
+	 */
+	public static function replace ($s, $sub, $by) {
+		#C:\HaxeToolkit\haxe\std/php/_std/StringTools.hx:104: lines 104-106
+		if ($sub === "") {
+			#C:\HaxeToolkit\haxe\std/php/_std/StringTools.hx:105: characters 4-89
+			return implode($by, preg_split("//u", $s, -1, PREG_SPLIT_NO_EMPTY));
+		}
+		#C:\HaxeToolkit\haxe\std/php/_std/StringTools.hx:107: characters 3-40
+		return str_replace($sub, $by, $s);
 	}
 
 	/**

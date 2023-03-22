@@ -1,6 +1,5 @@
 <?php
 /**
- * Haxe source file: C:\HaxeToolkit\haxe\std/php/Lib.hx
  */
 
 namespace php;

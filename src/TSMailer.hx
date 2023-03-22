@@ -1,7 +1,11 @@
 package;
 import haxe.Json;
+import haxe.crypto.Base64;
+import string.StringUtils;
+//import haxe.io.Bytes;
 import mail.Params;
 import mail.Results;
+
 //import mail.Params;
 import php.Lib;
 import php.Syntax;
@@ -19,7 +23,7 @@ typedef Result =
 }
 class TSMailer
 {
-	
+
 	var transport:Dynamic;
 	var mailer:Dynamic;
 	var body:Dynamic;
@@ -28,6 +32,7 @@ class TSMailer
 	var message:Dynamic;
 	var shouldSend:Bool;
 	var _result:Result;
+	var img:ImageData;
 
 	public function new()
 	{
@@ -38,13 +43,11 @@ class TSMailer
 		//Syntax.call(transport, "setPassword", "Saa..t33" );
 
 		mailer = Syntax.construct("Swift_Mailer", transport);
-		
-		
 
 		route = Web.getURI();
 		params = Web.getParams();
 		shouldSend = true;
-		
+
 		/////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////
 		if (params.exists(Params.SUBJECT))
@@ -96,7 +99,66 @@ class TSMailer
 	{
 		if (params.exists(Params.BODY))
 		{
-			Syntax.call(message, "setBody", params.get(Params.BODY), "text/html");
+			var b = params.get(Params.BODY);
+			//if (swiftImage != null)
+			if (params.exists( Params.IMAGE ))
+			{
+				var n:String = if (params.exists(Params.IMAGE_FULL_NAME))
+				{
+					StringUtils.removeWhite( StringTools.urlDecode(params.get(Params.IMAGE_FULL_NAME)));
+				}
+				else
+				{
+					"";
+				}
+				var img =
+				{
+					//bytes : params.get( Params.IMAGE ),
+					bytes : Base64.encode(Base64.urlDecode(params.get( Params.IMAGE ))),
+					name : n
+				}
+				var mime = if (img.name.toLowerCase().indexOf(".gif") > -1)
+				{
+					Params.MINE_TYPE_GIF;
+					//Params.MINE_UNKNOWN;
+				}
+				else if (img.name.toLowerCase().indexOf(".png") > -1)
+				{
+					Params.MINE_TYPE_PNG;
+				}
+				else if (img.name.toLowerCase().indexOf(".jpg") > -1 || img.name.toLowerCase().indexOf(".jpeg") > -1)
+				{
+					Params.MINE_TYPE_JPG;
+				}
+				else
+				{
+					Params.MINE_UNKNOWN;
+				}
+				//var bytes = ;
+				var src = 'data:$mime;base64,${img.bytes}';
+				var imgHtml = '<img src="$src" alt="${img.name}"/>';
+				var debug = img.name + " mime " + mime;
+				b = if (params.exists(Params.STRING_TO_REPLACE) )
+				{
+					#if debug
+					StringTools.replace(b, params.get(Params.STRING_TO_REPLACE), imgHtml + ' <em>$debug</em>');
+					#else
+					StringTools.replace(b, params.get(Params.STRING_TO_REPLACE), imgHtml );
+					#end
+				}
+				else
+				{
+					#if debug
+					StringTools.replace(b, "</body>", imgHtml + ' <em>$debug</em>' + "</body>");
+					#else
+					StringTools.replace(b, "</body>", imgHtml + "</body>");
+					#end
+				}
+				#if debug
+				_result.additional += debug;
+				#end
+			}
+			Syntax.call(message, "setBody", b, "text/html");
 		}
 		else
 		{
@@ -126,7 +188,7 @@ class TSMailer
 		if (params.exists(Params.CC_EMAIL))
 		{
 			var t = params.get(Params.CC_EMAIL).split(",");
-			
+
 			//Reflect.setField(cc, params.get("cc_email"), params.exists("cc_full_name") ? params.get("cc_full_name") : "" );
 			for (i in t)
 			{

@@ -1,16 +1,11 @@
 <?php
 /**
- * Haxe source file: C:\HaxeToolkit\haxe\lib\utils/utils/mail/Params.hx
  */
 
 namespace mail;
 
 use \php\Boot;
 
-/**
- * ...
- * @author bb
- */
 class Params {
 	/**
 	 * @var string
@@ -39,7 +34,23 @@ class Params {
 	/**
 	 * @var string
 	 */
-	const IMAGE_EXT = "imageExt";
+	const IMAGE_FULL_NAME = "imagefullname";
+	/**
+	 * @var string
+	 */
+	const MINE_TYPE_GIF = "image/gif";
+	/**
+	 * @var string
+	 */
+	const MINE_TYPE_JPG = "image/jpeg";
+	/**
+	 * @var string
+	 */
+	const MINE_TYPE_PNG = "image/png";
+	/**
+	 * @var string
+	 */
+	const MINE_UNKNOWN = "application/unknown";
 	/**
 	 * @var string
 	 */

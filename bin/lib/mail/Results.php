@@ -1,6 +1,5 @@
 <?php
 /**
- * Haxe source file: C:\HaxeToolkit\haxe\lib\utils/utils/mail/Results.hx
  */
 
 namespace mail;

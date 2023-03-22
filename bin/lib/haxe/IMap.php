@@ -1,6 +1,5 @@
 <?php
 /**
- * Haxe source file: C:\HaxeToolkit\haxe\std/haxe/Constraints.hx
  */
 
 namespace haxe;

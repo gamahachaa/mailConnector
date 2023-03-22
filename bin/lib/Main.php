@@ -1,6 +1,5 @@
 <?php
 /**
- * Haxe source file: src/Main.hx
  */
 
 use \php\_Boot\HxAnon;
