@@ -29,6 +29,18 @@ class Bytes {
 		#C:\HaxeToolkit\haxe\std/php/_std/haxe/io/Bytes.hx:35: characters 3-13
 		$this->b = $b;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function toString () {
+		#C:\HaxeToolkit\haxe\std/php/_std/haxe/io/Bytes.hx:135: characters 3-11
+		return $this->b->s;
+	}
+
+	public function __toString() {
+		return $this->toString();
+	}
 }
 
 Boot::registerClass(Bytes::class, 'haxe.io.Bytes');

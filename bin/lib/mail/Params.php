@@ -6,10 +6,6 @@ namespace mail;
 
 use \php\Boot;
 
-/**
- * ...
- * @author bb
- */
 class Params {
 	/**
 	 * @var string
@@ -26,6 +22,10 @@ class Params {
 	/**
 	 * @var string
 	 */
+	const FROM_FULL_MAIL = "from_full_name";
+	/**
+	 * @var string
+	 */
 	const FROM_MAIL = "from_email";
 	/**
 	 * @var string
@@ -34,7 +34,23 @@ class Params {
 	/**
 	 * @var string
 	 */
-	const IMAGE_EXT = "imageExt";
+	const IMAGE_FULL_NAME = "imagefullname";
+	/**
+	 * @var string
+	 */
+	const MINE_TYPE_GIF = "image/gif";
+	/**
+	 * @var string
+	 */
+	const MINE_TYPE_JPG = "image/jpeg";
+	/**
+	 * @var string
+	 */
+	const MINE_TYPE_PNG = "image/png";
+	/**
+	 * @var string
+	 */
+	const MINE_UNKNOWN = "application/unknown";
 	/**
 	 * @var string
 	 */

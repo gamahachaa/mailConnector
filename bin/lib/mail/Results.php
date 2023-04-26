@@ -15,6 +15,10 @@ class Results {
 	 * @var string
 	 */
 	const FAILED = "failed";
+	/**
+	 * @var string
+	 */
+	const SUCCESS = "success";
 
 }
 
